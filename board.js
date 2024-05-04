@@ -25,6 +25,7 @@ export default class Board {
   }
 
   makeGrid(size) {
+    size **= 2
     this.grid = new Array(size).fill(0)
   }
 }
