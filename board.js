@@ -1,13 +1,15 @@
 import { qs } from '/helpers.js'
 
 export default class Board {
-  constructor(size) {
+  constructor(size = 3) {
     this.$board = qs('.board')
-    this.size = 3 || size
-    this.grid(this.size)
+    this.size = size
+    this.grid = []
+    this.makeGrid(size)
+    this.updateGrid(size)
   }
 
-  grid(size) {
+  updateGrid(size) {
     this.$board.style.gridTemplateColumns = `repeat(${size}, 1fr)`
     this.$board.style.gridTemplateRows = `repeat(${size}, 1fr)`
     this.$board.innerHTML = null
@@ -20,5 +22,9 @@ export default class Board {
       </div>`
       this.$board.innerHTML += moleHTML
     }
+  }
+
+  makeGrid(size) {
+    this.grid = new Array(size).fill(0)
   }
 }
