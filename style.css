@@ -4,6 +4,8 @@
 }
 
 * {
+  margin: 0;
+  padding: 0;
   min-width: 0;
   font: inherit;
 }
@@ -32,6 +34,27 @@ h1 {
 main {
   position: relative;
   perspective: 2000px;
+}
+
+.overlay {
+  z-index: 99;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  position: fixed;
+  align-items: center;
+  justify-content: center;
+  background: hsla(0, 0%, 0%, 0.5);
+}
+
+.start-button {
+  cursor: pointer;
+  border: none;
+  color: black;
+  font-size: 2rem;
+  padding: 0.4em 1.5em;
+  border-radius: 2em;
+  background: white;
 }
 
 .background {
