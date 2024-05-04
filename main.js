@@ -9,17 +9,34 @@ class Whacka {
     this.currentMoles = []
     this.molesHx = []
     this.score = 0
-    this.update()
+    this.time = 30
   }
 
   update() {
-    this.updateMoles()
-    window.requestAnimationFrame(() => this.update())
+    qs('[data-time]').textContent = `time: ${this.time}s`
     qs('.score').textContent = `score: ${this.score}`
+    this.updateMoles()
+    if (this.time === 0) return this.end()
+    window.requestAnimationFrame(() => this.update())
   }
 
   start(moles) {
     for (let i = 0; i < moles; i++) this.pickMole()
+    this.timer(true)
+    this.update()
+  }
+
+  end() {
+    this.timer(false)
+  }
+
+  timer(isStart) {
+    if (isStart) {
+      this.intervalId = setInterval(() => {
+        this.time--
+      }, 1000)
+    }
+    if (!isStart) clearInterval(this.intervalId)
   }
 
   pickMole() {
@@ -53,11 +70,11 @@ class Whacka {
   }
 
   updateMoles() {
-    this.$moles.forEach(mole => mole.classList.remove('mole--show'))
     const size = this.board.size * this.board.size
     for (let i = 0; i < size; i++) {
       const mole = this.$moles[i]
       if (this.board.grid[i] === 1) mole.classList.add('mole--show')
+      else mole.classList.remove('mole--show')
     }
   }
 
@@ -102,4 +119,7 @@ function ready() {
   game.start(3)
 }
 
-ready()
+$on(qs('.start-button'), 'click', () => {
+  qs('.overlay').style.display = 'none'
+  ready()
+})
