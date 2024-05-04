@@ -1,19 +1,21 @@
-import { qsa, $on } from './helpers.js'
+import { qs, qsa, $on } from './helpers.js'
 import Board from './board.js'
 
 class Whacka {
   constructor() {
-    this.dbHide = this.db(this.hideMole, 2000)
+    this.dbHide = this.db(this.hideMole, 2500)
     this.board = new Board(3)
     this.$moles = qsa('.mole')
     this.currentMoles = []
     this.molesHx = []
+    this.score = 0
     this.update()
   }
 
   update() {
     this.updateMoles()
     window.requestAnimationFrame(() => this.update())
+    qs('.score').textContent = `score: ${this.score}`
   }
 
   start(moles) {
@@ -31,8 +33,11 @@ class Whacka {
   }
 
   hideMole() {
-    this.board.grid[this.currentMoles[0]] = 0
+    const i = this.currentMoles[0]
+    this.board.grid[i] = 0
+    this.updateMolesHx(i)
     this.pickMole()
+    this.score -= 7
   }
 
   hitMole(i) {
@@ -40,6 +45,11 @@ class Whacka {
     this.board.grid[i] = 0
     this.updateMolesHx(i)
     this.pickMole()
+    this.score += 10
+  }
+
+  missedHit() {
+    this.score -= 3
   }
 
   updateMoles() {
@@ -85,7 +95,9 @@ class Whacka {
 
 function ready() {
   const game = new Whacka()
+  const $board = qs('.board')
   const $moles = qsa('.mole-hole')
+  $on($board, 'mousedown', () => game.missedHit())
   $moles.forEach((mole, index) => $on(mole, 'mousedown', () => game.hitMole(index)))
   game.start(3)
 }
