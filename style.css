@@ -1,5 +1,5 @@
 :root {
-  --bg-clr: rgb(18, 70, 54);
+  --bg-clr: rgb(66, 66, 66);
   color-scheme: dark light;
 }
 
@@ -25,7 +25,7 @@ body {
 }
 
 h1 {
-  font-size: xx-large;
+  font-size: 2.5em;
   font-weight: 600;
 }
 
@@ -35,18 +35,18 @@ main {
 }
 
 .background {
+  width: 100%;
   aspect-ratio: 1;
   position: absolute;
   border-radius: 3rem;
-  transform: rotateX(20deg) translateY(-10px);
-  width: clamp(0px, 700px, 75vw);
   background-color: var(--bg-clr);
+  transform: rotateX(20deg) translateY(-10px);
 }
 
 .board {
   display: grid;
   aspect-ratio: 1;
-  width: clamp(0px, 700px, 75vw);
+  width: clamp(0px, 700px, 90vw);
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
 }
@@ -72,27 +72,30 @@ main {
 .mole-hole {
   width: 50%;
   display: flex;
-  aspect-ratio: 1;
   cursor: pointer;
   overflow: hidden;
   position: relative;
   align-items: center;
+  aspect-ratio: 1.25/1;
   justify-content: center;
 }
 
 .mole {
-  --time: 2000ms;
-  top: 125%;
+  --bezier: cubic-bezier(0, 0.75, 0.4, 1.1);
   left: 50%;
+  width: 100px;
   height: 150px;
-  aspect-ratio: 1/2;
   position: absolute;
   background-color: white;
-  transform: translateX(-50%);
-  transition: transform var(--time) ease-in-out;
+  transform: translateX(-50%) translateY(100%);
+  transition: transform 100ms var(--bezier);
 }
 
 .mole--show {
-  transform: translateX(-50%) translateY(-90%);
-  transition: transform var(--time) ease-in-out;
+  transform: translateX(-50%) translateY(20%);
+  transition: transform 500ms var(--bezier);
+}
+
+.score {
+  font-size: 2em;
 }
