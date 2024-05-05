@@ -2,14 +2,14 @@ import { qs, qsa, $on } from './helpers.js'
 import Board from './board.js'
 
 class Whacka {
-  constructor() {
+  constructor(time, size) {
     this.dbHide = this.db(this.hideMole, 2500)
-    this.board = new Board(3)
+    this.board = new Board(size)
     this.$moles = qsa('.mole')
     this.currentMoles = []
     this.molesHx = []
     this.score = 0
-    this.time = 30
+    this.time = time
   }
 
   update() {
@@ -27,6 +27,9 @@ class Whacka {
   }
 
   end() {
+    const overlay = qs('.overlay')
+    overlay.removeAttribute('style')
+    overlay.innerHTML = `<p>${this.score}<p>`
     this.timer(false)
   }
 
@@ -40,10 +43,8 @@ class Whacka {
   }
 
   pickMole() {
-    const size = this.board.size ** 2
-    const i = Math.floor(Math.random() * size)
-    if (this.molesHx.includes(i)) return this.pickMole()
-    if (this.board.grid[i] === 1) return this.pickMole()
+    const i = Math.floor(Math.random() * this.board.size ** 2)
+    if (this.molesHx.includes(i) || this.board.grid[i] === 1) return this.pickMole()
     this.updateCurrentMoles(i)
     this.board.grid[i] = 1
     this.dbHide()
@@ -89,8 +90,8 @@ class Whacka {
   }
 
   updateCurrentMoles(n) {
-    const hxLength = 3
-    if (this.currentMoles.length < hxLength) this.currentMoles.push(n)
+    const arrayLength = 3
+    if (this.currentMoles.length < arrayLength) this.currentMoles.push(n)
     else {
       this.currentMoles.shift()
       this.currentMoles.push(n)
@@ -99,10 +100,8 @@ class Whacka {
 
   db(func, delay) {
     let timerId
-
     return function (...args) {
       clearTimeout(timerId)
-
       timerId = setTimeout(() => {
         func.apply(this, args)
       }, delay)
@@ -111,7 +110,7 @@ class Whacka {
 }
 
 function ready() {
-  const game = new Whacka()
+  const game = new Whacka(5, 3)
   const $board = qs('.board')
   const $moles = qsa('.mole-hole')
   $on($board, 'mousedown', () => game.missedHit())

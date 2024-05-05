@@ -47,6 +47,10 @@ main {
   background: hsla(0, 0%, 0%, 0.5);
 }
 
+.overlay p {
+  font-size: 2.5em;
+}
+
 .start-button {
   cursor: pointer;
   border: none;
