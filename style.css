@@ -1,5 +1,5 @@
 :root {
-  --bg-clr: rgb(66, 66, 66);
+  --bg-clr: rgb(65, 101, 136);
   color-scheme: dark light;
 }
 
@@ -24,6 +24,7 @@ body {
   flex-direction: column;
   justify-content: center;
   font-family: 'Montserrat', sans-serif;
+  background-color: hsla(219, 22%, 52%, 0.15);
 }
 
 h1 {
@@ -37,6 +38,7 @@ main {
 }
 
 .overlay {
+  opacity: 0;
   z-index: 99;
   width: 100vw;
   height: 100vh;
@@ -45,6 +47,10 @@ main {
   align-items: center;
   justify-content: center;
   background: hsla(0, 0%, 0%, 0.5);
+}
+
+.score {
+  font-size: 2em;
 }
 
 .overlay p {
@@ -67,6 +73,7 @@ main {
   position: absolute;
   border-radius: 3rem;
   background-color: var(--bg-clr);
+  border: 2px solid rgb(100, 150, 200);
   transform: rotateX(20deg) translateY(-10px);
 }
 
@@ -113,17 +120,12 @@ main {
   width: 100px;
   height: 150px;
   position: absolute;
-  background-color: transparent;
-  transform: translateX(-50%) translateY(100%);
-  transition: transform 100ms var(--bezier);
   background-image: url(/images/mole.png);
+  transition: transform 100ms var(--bezier);
+  transform: translateX(-50%) translateY(100%);
 }
 
 .mole--show {
-  transform: translateX(-50%) translateY(20%);
   transition: transform 500ms var(--bezier);
-}
-
-.score {
-  font-size: 2em;
+  transform: translateX(-50%) translateY(20%);
 }
