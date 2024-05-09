@@ -1,5 +1,5 @@
 :root {
-  --bg-clr: rgb(65, 101, 136);
+  --bg-clr: hsl(210, 40%, 25%);
   color-scheme: dark light;
 }
 
@@ -38,7 +38,6 @@ main {
 }
 
 .overlay {
-  opacity: 0;
   z-index: 99;
   width: 100vw;
   height: 100vh;
@@ -73,7 +72,7 @@ main {
   position: absolute;
   border-radius: 3rem;
   background-color: var(--bg-clr);
-  border: 2px solid rgb(100, 150, 200);
+  border: 2px solid hsl(210, 40%, 40%);
   transform: rotateX(20deg) translateY(-10px);
 }
 
