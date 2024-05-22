@@ -4,6 +4,7 @@ import Board from './board.js'
 export default class Whacka {
   constructor(time, size = 3, moles = 3) {
     this.dbHide = this.db(this.hideMole, 1000)
+    this.dbPickMole = this.db(this.pickMole, 100)
     this.board = new Board(size)
     this.$moles = qsa('.mole')
     this.moles = moles
@@ -55,7 +56,7 @@ export default class Whacka {
     const i = this.currentMoles[0]
     this.board.grid[i] = 0
     this.updateMolesHx(i)
-    this.pickMole()
+    this.dbPickMole()
     this.score -= 7
   }
 
@@ -63,7 +64,7 @@ export default class Whacka {
     if (this.board.grid[i] === 0) return
     this.board.grid[i] = 0
     this.updateMolesHx(i)
-    this.pickMole()
+    this.dbPickMole()
     this.score += 10
   }
 
@@ -82,9 +83,8 @@ export default class Whacka {
 
   updateMolesHx(n) {
     const hxLength = 1
-    if (this.molesHx.length < hxLength) {
-      this.molesHx.push(n)
-    } else {
+    if (this.molesHx.length < hxLength) this.molesHx.push(n)
+    else {
       this.molesHx.shift()
       this.molesHx.push(n)
     }
