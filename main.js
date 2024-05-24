@@ -3,10 +3,14 @@ import Whacka from './whacka.js'
 
 function ready() {
   const game = new Whacka(30, 3, 3)
-  const $board = qs('.board')
   const $moles = qsa('.mole-hole')
-  $on($board, 'mousedown', () => game.missedHit())
-  $moles.forEach((mole, index) => $on(mole, 'mousedown', () => game.hitMole(index)))
+
+  $moles.forEach((mole, i) =>
+    $on(mole, 'mousedown', () => {
+      game.hitMole(i)
+    }),
+  )
+
   game.start()
 }
 
@@ -14,3 +18,6 @@ $on(qs('.start-button'), 'click', () => {
   qs('.overlay').style.display = 'none'
   ready()
 })
+
+qs('.overlay').style.display = 'none'
+ready()
