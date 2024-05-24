@@ -2,18 +2,22 @@ import { qsa } from './helpers.js'
 import Board from './board.js'
 
 export default class Whacka {
-  constructor(time, size = 3, moles = 3) {
+  constructor(time, size = 3, amountOfMoles = 3) {
     this.board = new Board(size)
     this.$moles = qsa('.mole')
     this.moles = new Map()
     this.time = time
     this.score = 0
-    this.amountOfMoles = moles
+    this.amountOfMoles = amountOfMoles
+    this.lastMoles = []
+    this.visibleMoles = 0
   }
 
-  loop() {
+  loop(timestamp) {
+    const timeElapsted = timestamp
+    console.log(timeElapsted)
     this.updateMoles()
-    window.requestAnimationFrame(() => this.loop())
+    requestAnimationFrame(() => this.loop())
   }
 
   start() {
@@ -22,46 +26,44 @@ export default class Whacka {
   }
 
   pickMole() {
-    const i = Math.floor(Math.random() * this.board.size ** 2)
-    if (this.board.grid[i] === 1) return this.pickMole()
+    let i
+    do {
+      i = Math.floor(Math.random() * this.board.size ** 2)
+    } while (this.board.grid[i] === 1 || this.lastMoles.includes(i))
     this.board.grid[i] = 1
-    this.hideMole(i)
+    this.updateLastMoles(i)
   }
 
   hideMole(i) {
-    const timeToHide = 1000 // milliseconds
-
-    setTimeout(() => {
-      if (this.board.grid[i] === 1) {
-        this.board.grid[i] = 0
-      }
-    }, timeToHide)
+    if (this.board.grid[i] === 1) {
+      this.board.grid[i] = 0
+    }
   }
 
-  missedHit() {
-    this.score -= 3
+  hitMole(i) {
+    this.hideMole(i)
+  }
+
+  autoHide() {
+    const i = this.lastMoles[2]
+    this.hideMole(i)
+  }
+
+  updateLastMoles(i) {
+    const length = 4
+    if (this.lastMoles.length === length) {
+      this.lastMoles.pop()
+    }
+    this.lastMoles.unshift(i)
   }
 
   updateMoles() {
-    const size = this.board.size ** 2
-
-    for (let i = 0; i < size; i++) {
-      const mole = this.$moles[i]
-
-      if (this.board.grid[i] === 1) {
-        mole.classList.add('mole--show')
-      } else mole.classList.remove('mole--show')
-    }
-  }
-
-  timer(isStart) {
-    const interval = 1000 // 1 second in milliseconds
-    if (isStart) {
-      this.intervalId = setInterval(() => {
-        this.time--
-      }, interval)
-    }
-
-    if (!isStart) clearInterval(this.intervalId)
+    this.visibleMoles = 0
+    this.$moles.forEach((mole, i) => {
+      const isMole = this.board.grid[i] === 1
+      mole.classList.toggle('mole--show', isMole)
+      if (isMole) this.visibleMoles++
+    })
+    if (this.visibleMoles < 3) this.pickMole()
   }
 }
