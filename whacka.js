@@ -1,69 +1,71 @@
 import { qsa } from './helpers.js'
 import Board from './board.js'
+import Loop from './loop.js'
 
 export default class Whacka {
-  constructor(time, size = 3, amountOfMoles = 3) {
+  constructor(timer, size = 3, amountOfMoles = 3) {
+    this.amountOfMoles = amountOfMoles
     this.board = new Board(size)
     this.$moles = qsa('.mole')
-    this.moles = new Map()
-    this.time = time
-    this.score = 0
-    this.amountOfMoles = amountOfMoles
-    this.lastMoles = []
+    this.loop = new Loop()
+    this.timer = timer
+    this.lastMole
+    this.currMoles = []
     this.visibleMoles = 0
-  }
-
-  loop(timestamp) {
-    const timeElapsted = timestamp
-    console.log(timeElapsted)
-    this.updateMoles()
-    requestAnimationFrame(() => this.loop())
+    this.lastMole
+    this.oldTs = 0
+    this.ms = 0
+    this.time = 0
+    this.timeToHide = 600 // milliseconds
   }
 
   start() {
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
-    this.loop()
+    requestAnimationFrame(this.loop.bind(this))
+  }
+
+  showMoles() {
+    this.$moles.forEach((mole, i) => {
+      const isMole = this.board.grid[i] === 1
+      mole.classList.toggle('mole--show', isMole)
+      if (isMole) this.visibleMoles++
+    })
   }
 
   pickMole() {
     let i
     do {
       i = Math.floor(Math.random() * this.board.size ** 2)
-    } while (this.board.grid[i] === 1 || this.lastMoles.includes(i))
+    } while (this.board.grid[i] === 1 || this.lastMole === i)
     this.board.grid[i] = 1
-    this.updateLastMoles(i)
+    this.updateCurrMoles(i)
   }
 
   hideMole(i) {
-    if (this.board.grid[i] === 1) {
-      this.board.grid[i] = 0
+    if (this.board.grid[i] === 0) return
+    this.board.grid[i] = 0
+    this.time = 0
+    this.lastMole = i
+    this.updateCurrMoles(i, true)
+  }
+
+  updateCurrMoles(n, wasHit) {
+    if (wasHit === true) {
+      this.currMoles = this.currMoles.filter(mole => mole !== n)
+      return
+    }
+    if (this.currMoles.length < this.amountOfMoles) this.currMoles.push(n)
+    else {
+      this.currMoles.shift()
+      this.currMoles.push(n)
     }
   }
 
-  hitMole(i) {
-    this.hideMole(i)
-  }
-
-  autoHide() {
-    const i = this.lastMoles[2]
-    this.hideMole(i)
-  }
-
-  updateLastMoles(i) {
-    const length = 4
-    if (this.lastMoles.length === length) {
-      this.lastMoles.pop()
-    }
-    this.lastMoles.unshift(i)
-  }
-
-  updateMoles() {
+  update() {
     this.visibleMoles = 0
-    this.$moles.forEach((mole, i) => {
-      const isMole = this.board.grid[i] === 1
-      mole.classList.toggle('mole--show', isMole)
-      if (isMole) this.visibleMoles++
-    })
+    if (this.time >= this.timeToHide) this.hideMole(this.currMoles[0])
+
+    this.showMoles()
     if (this.visibleMoles < 3) this.pickMole()
   }
 }
