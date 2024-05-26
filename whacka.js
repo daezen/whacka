@@ -1,27 +1,27 @@
-import { qsa } from './helpers.js'
+import { qsa, qs } from './helpers.js'
 import Board from './board.js'
 import Loop from './loop.js'
+import View from './view.js'
 
 export default class Whacka {
-  constructor(timer, size = 3, amountOfMoles = 3) {
-    this.amountOfMoles = amountOfMoles
+  constructor(time, size = 3, amountOfMoles = 3) {
+    this.view = new View(qs('[data-time]'), qs('.overlay'), time)
+    this.loop = new Loop(() => this.update())
     this.board = new Board(size)
-    this.$moles = qsa('.mole')
-    this.loop = new Loop()
-    this.timer = timer
     this.lastMole
     this.currMoles = []
+    this.msToHide = 1000
     this.visibleMoles = 0
-    this.lastMole
-    this.oldTs = 0
-    this.ms = 0
-    this.time = 0
-    this.timeToHide = 600 // milliseconds
+    this.msSinceLastHidden = 0
+    this.$moles = qsa('.mole')
+    this.amountOfMoles = amountOfMoles
   }
 
   start() {
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
-    requestAnimationFrame(this.loop.bind(this))
+    this.view.toggleOverlay(false)
+    this.view.timer(true)
+    this.loop.start()
   }
 
   showMoles() {
@@ -44,8 +44,8 @@ export default class Whacka {
   hideMole(i) {
     if (this.board.grid[i] === 0) return
     this.board.grid[i] = 0
-    this.time = 0
     this.lastMole = i
+    this.loop.resetTime()
     this.updateCurrMoles(i, true)
   }
 
@@ -63,9 +63,10 @@ export default class Whacka {
 
   update() {
     this.visibleMoles = 0
-    if (this.time >= this.timeToHide) this.hideMole(this.currMoles[0])
+    if (this.loop.time >= this.msToHide) this.hideMole(this.currMoles[0])
 
     this.showMoles()
     if (this.visibleMoles < 3) this.pickMole()
+    if (this.view.time === 0) this.loop.stop()
   }
 }
