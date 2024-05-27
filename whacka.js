@@ -5,9 +5,11 @@ import View from './view.js'
 
 export default class Whacka {
   constructor(time, size = 3, amountOfMoles = 3) {
-    this.view = new View(qs('[data-time]'), qs('.overlay'), time)
+    this.view = new View(qs('[data-time]'), qs('.overlay'), qs('.score'))
     this.loop = new Loop(() => this.update())
     this.board = new Board(size)
+    this.time = time
+    this.score = 0
     this.lastMole
     this.currMoles = []
     this.msToHide = 1000
@@ -15,12 +17,24 @@ export default class Whacka {
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
+    this.view.setTime(this.time)
+  }
+
+  timer(toStart) {
+    if (toStart) {
+      this.intervalId = setInterval(() => {
+        this.time--
+        this.view.setTime(this.time)
+      }, 1000)
+    }
+
+    if (!toStart) clearTimeout(this.intervalId)
   }
 
   start() {
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
     this.view.toggleOverlay(false)
-    this.view.timer(true)
+    this.timer(true)
     this.loop.start()
   }
 
@@ -41,12 +55,15 @@ export default class Whacka {
     this.updateCurrMoles(i)
   }
 
-  hideMole(i) {
+  hideMole(i, wasHit) {
     if (this.board.grid[i] === 0) return
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
-    this.updateCurrMoles(i, true)
+    if (wasHit) {
+      this.updateCurrMoles(i, true)
+      this.score += 10
+    }
   }
 
   updateCurrMoles(n, wasHit) {
@@ -62,6 +79,7 @@ export default class Whacka {
   }
 
   update() {
+    this.view.setScore(this.score)
     this.visibleMoles = 0
     if (this.loop.time >= this.msToHide) this.hideMole(this.currMoles[0])
 
