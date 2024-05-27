@@ -1,9 +1,8 @@
 export default class View {
-  constructor($timer, $overlay, time) {
+  constructor($timer, $overlay, $score) {
     this.$timer = $timer
     this.$overlay = $overlay
-    this.time = time
-    this.$timer.textContent = `time: ${this.time}s`
+    this.$score = $score
   }
 
   toggleOverlay(toShow) {
@@ -11,14 +10,11 @@ export default class View {
     if (toShow) this.$overlay.removeAttribute('style')
   }
 
-  timer(toStart) {
-    if (toStart) {
-      this.intervalId = setInterval(() => {
-        this.time--
-        this.$timer.textContent = `time: ${this.time}s`
-      }, 1000)
-    }
+  setTime(time) {
+    this.$timer.textContent = `time: ${time}s`
+  }
 
-    if (!toStart) clearTimeout(this.intervalId)
+  setScore(score) {
+    this.$score.textContent = `score: ${score}`
   }
 }
