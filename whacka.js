@@ -27,7 +27,6 @@ export default class Whacka {
         this.view.setTime(this.time)
       }, 1000)
     }
-
     if (!toStart) clearTimeout(this.intervalId)
   }
 
@@ -55,15 +54,21 @@ export default class Whacka {
     this.updateCurrMoles(i)
   }
 
-  hideMole(i, wasHit) {
+  hideMole(i) {
     if (this.board.grid[i] === 0) return
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
-    if (wasHit) {
-      this.updateCurrMoles(i, true)
-      this.score += 10
-    }
+  }
+
+  hitMole(i) {
+    this.hideMole(i)
+    this.updateCurrMoles(i, true)
+    this.score += 10
+  }
+
+  hitBoard() {
+    this.score -= 5
   }
 
   updateCurrMoles(n, wasHit) {
@@ -81,7 +86,10 @@ export default class Whacka {
   update() {
     this.view.setScore(this.score)
     this.visibleMoles = 0
-    if (this.loop.time >= this.msToHide) this.hideMole(this.currMoles[0])
+    if (this.loop.time >= this.msToHide) {
+      this.hideMole(this.currMoles[0])
+      this.score -= 7
+    }
 
     this.showMoles()
     if (this.visibleMoles < 3) this.pickMole()
