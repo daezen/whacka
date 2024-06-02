@@ -10,7 +10,7 @@ export default class Whacka {
     this.board = new Board(size)
     this.time = time
     this.score = 0
-    this.lastMole
+    this.lastMole = null
     this.currMoles = []
     this.msToHide = 1000
     this.visibleMoles = 0
@@ -20,14 +20,14 @@ export default class Whacka {
     this.view.setTime(this.time)
   }
 
-  timer(toStart) {
-    if (toStart) {
+  timer(start) {
+    if (start) {
       this.intervalId = setInterval(() => {
         this.time--
         this.view.setTime(this.time)
       }, 1000)
     }
-    if (!toStart) clearTimeout(this.intervalId)
+    if (!start) clearTimeout(this.intervalId)
   }
 
   start() {
@@ -59,10 +59,14 @@ export default class Whacka {
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
+    this.updateCurrMoles(i)
   }
 
   hitMole(i) {
-    this.hideMole(i)
+    if (this.board.grid[i] === 0) return
+    this.board.grid[i] = 0
+    this.lastMole = i
+    this.loop.resetTime()
     this.updateCurrMoles(i, true)
     this.score += 10
   }
