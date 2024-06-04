@@ -6,13 +6,11 @@ function ready() {
   const game = new Whacka(30, 3, 3)
   const $moles = qsa('.mole-hole')
 
-  $on(document.body, 'click', e => {
-    console.log(e.target.classList.contains('mole'))
-  })
-  $moles.forEach((mole, i) =>
-    $on(mole, 'mousedown', () => game.hitMole(i)),
-  )
+  $on(document.body, 'click', (e) => {
 
+
+  })
+  $moles.forEach((mole, i) => $on(mole, 'mousedown', () => game.hitMole(i)))
   game.start()
 }
 
