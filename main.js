@@ -3,14 +3,19 @@ import Whacka from './whacka.js'
 const $start = qs('.start-button')
 
 function ready() {
-  const game = new Whacka(30, 3, 3)
+  const game = new Whacka(30)
   const $moles = qsa('.mole-hole')
 
   $on(document.body, 'click', e => {
-    if (!e.target.matches('.mole-hole')) {
+    if (
+      e.target.matches('.mole-container') ||
+      e.target.matches('.background') ||
+      e.target.matches('.board')
+    ) {
       game.hitBoard()
     }
   })
+
   $moles.forEach((mole, i) => $on(mole, 'mousedown', () => game.hitMole(i)))
   game.start()
 }
