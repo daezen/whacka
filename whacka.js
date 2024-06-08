@@ -12,7 +12,7 @@ export default class Whacka {
     this.score = 0
     this.lastMole = null
     this.currMoles = []
-    this.msToHide = 1000
+    this.msToHide = 500
     this.visibleMoles = 0
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
@@ -24,7 +24,6 @@ export default class Whacka {
     if (start) {
       this.intervalId = setInterval(() => {
         this.time--
-        this.view.setTime(this.time)
       }, 1000)
     }
     if (!start) clearTimeout(this.intervalId)
@@ -59,11 +58,11 @@ export default class Whacka {
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
-    this.updateCurrMoles(i)
+    this.score -= 7
   }
 
   hitMole(i) {
-    if (this.board.grid[i] === 0) return
+    if (this.board.grid[i] === 0) return (this.score -= 5)
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
@@ -80,6 +79,7 @@ export default class Whacka {
       this.currMoles = this.currMoles.filter(mole => mole !== n)
       return
     }
+
     if (this.currMoles.length < this.amountOfMoles) this.currMoles.push(n)
     else {
       this.currMoles.shift()
@@ -89,14 +89,21 @@ export default class Whacka {
 
   update() {
     this.view.setScore(this.score)
+    this.view.setTime(this.time)
     this.visibleMoles = 0
+
     if (this.loop.time >= this.msToHide) {
       this.hideMole(this.currMoles[0])
-      this.score -= 7
     }
 
     this.showMoles()
-    if (this.visibleMoles < 3) this.pickMole()
-    if (this.view.time === 0) this.loop.stop()
+
+    if (this.visibleMoles < 3) {
+      this.pickMole()
+    }
+
+    if (this.time === 0) {
+      this.loop.stop()
+    }
   }
 }
