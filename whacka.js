@@ -9,10 +9,10 @@ export default class Whacka {
     this.loop = new Loop(() => this.update())
     this.board = new Board(size)
     this.time = time
-    this.score = 5
+    this.score = 0
     this.lastMole = null
     this.currMoles = []
-    this.msToHide = 500
+    this.msToHide = 600
     this.visibleMoles = 0
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
