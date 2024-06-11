@@ -6,7 +6,7 @@ function ready() {
   const game = new Whacka(30)
   const $moles = qsa('.mole-hole')
 
-  $on(document.body, 'click', e => {
+  $on(document.body, 'mousedown', e => {
     if (
       e.target.matches('.mole-container') ||
       e.target.matches('.background') ||
