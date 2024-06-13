@@ -36,6 +36,11 @@ export default class Whacka {
     this.loop.start()
   }
 
+  stop() {
+    this.view.toggleOverlay(true)
+    this.loop.stop()
+  }
+
   showMoles() {
     this.$moles.forEach((mole, i) => {
       const isMole = this.board.grid[i] === 1
@@ -103,7 +108,7 @@ export default class Whacka {
     }
 
     if (this.time === 0) {
-      this.loop.stop()
+      this.stop()
     }
   }
 }
