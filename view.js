@@ -11,10 +11,15 @@ export default class View {
   }
 
   setTime(time) {
-    this.$timer.textContent = `time: ${time}s`
+    this.$timer.textContent = `Time: ${time}s`
   }
 
   setScore(score) {
-    this.$score.textContent = `score: ${score}`
+    this.$score.textContent = `Score: ${score}`
+  }
+
+  showScoreOverlay(score) {
+    let htmlString = `<div class="score-overlay"><p>Final Score: ${score}</p><button class="play-again">Play again</button></div>`
+    this.$overlay.innerHTML = `${htmlString}`
   }
 }
