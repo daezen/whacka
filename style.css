@@ -130,3 +130,31 @@ main {
   transition: transform 500ms var(--bezier);
   transform: translateX(-50%) translateY(20%);
 }
+
+.score-overlay {
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  flex-flow: column;
+  border-radius: 25px;
+  user-select: none;
+  padding: 2rem;
+  height: 300px;
+  width: 500px;
+  background: hsla(0, 0%, 0%, 0.4);
+  backdrop-filter: blur(69px);
+}
+
+.score-overlay p {
+  flex: 1;
+}
+
+.play-again {
+  cursor: pointer;
+  border: none;
+  color: black;
+  font-size: 2rem;
+  padding: 0.4em 1.5em;
+  border-radius: 2em;
+  background: white;
+}
