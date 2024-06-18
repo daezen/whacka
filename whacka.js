@@ -7,8 +7,10 @@ export default class Whacka {
   constructor(time, size = 3, amountOfMoles = 3) {
     this.view = new View(qs('[data-time]'), qs('.overlay'), qs('.score'))
     this.loop = new Loop(() => this.update())
-    this.board = new Board(size)
+    this.size = size
+    this.board = new Board(this.size)
     this.time = time
+    this.timer = time
     this.score = 0
     this.lastMole = null
     this.currMoles = []
@@ -30,7 +32,6 @@ export default class Whacka {
   }
 
   start() {
-    this.reset()
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
     this.view.toggleOverlay(false)
     this.timerInterval(true)
@@ -41,14 +42,18 @@ export default class Whacka {
     this.view.toggleOverlay(true)
     this.loop.stop()
     this.view.showScoreOverlay(this.score)
+    this.timerInterval(false)
   }
 
   reset() {
-    this.timer = this.time
     this.score = 0
+    this.timer = this.time
     this.lastMole = null
     this.currMoles = []
     this.visibleMoles = 0
+    this.board = new Board(this.size)
+    this.$moles = qsa('.mole')
+    this.start()
   }
 
   showMoles() {
