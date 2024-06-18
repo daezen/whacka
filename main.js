@@ -8,7 +8,7 @@ function ready() {
 
   $on(document.body, 'mousedown', e => {
     if (e.target.matches('.play-again')) {
-      game.start()
+      game.reset()
     }
 
     if (
