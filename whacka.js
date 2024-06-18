@@ -17,28 +17,38 @@ export default class Whacka {
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
-    this.view.setTime(this.time)
+    this.view.setTime(time)
   }
 
-  timer(start) {
+  timerInterval(start) {
     if (start) {
       this.intervalId = setInterval(() => {
-        this.time--
+        this.timer--
       }, 1000)
     }
     if (!start) clearTimeout(this.intervalId)
   }
 
   start() {
+    this.reset()
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
     this.view.toggleOverlay(false)
-    this.timer(true)
+    this.timerInterval(true)
     this.loop.start()
   }
 
   stop() {
     this.view.toggleOverlay(true)
     this.loop.stop()
+    this.view.showScoreOverlay(this.score)
+  }
+
+  reset() {
+    this.timer = this.time
+    this.score = 0
+    this.lastMole = null
+    this.currMoles = []
+    this.visibleMoles = 0
   }
 
   showMoles() {
@@ -94,7 +104,7 @@ export default class Whacka {
 
   update() {
     this.view.setScore(this.score)
-    this.view.setTime(this.time)
+    this.view.setTime(this.timer)
     this.visibleMoles = 0
 
     if (this.loop.time >= this.msToHide) {
@@ -107,7 +117,7 @@ export default class Whacka {
       this.pickMole()
     }
 
-    if (this.time === 0) {
+    if (this.timer === 0) {
       this.stop()
     }
   }
