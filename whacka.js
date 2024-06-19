@@ -107,7 +107,7 @@ export default class Whacka {
     }
   }
 
-  update() {
+  update() { 
     this.view.setScore(this.score)
     this.view.setTime(this.timer)
     this.visibleMoles = 0
@@ -121,6 +121,7 @@ export default class Whacka {
     if (this.visibleMoles < 3) {
       this.pickMole()
     }
+    if (this.score < 0) this.score = 0
 
     if (this.timer === 0) {
       this.stop()
