@@ -1,11 +1,9 @@
-import { qs, qsa, $on } from './helpers.js'
+import { qs, $on } from './helpers.js'
 import Whacka from './whacka.js'
 const $start = qs('.start-button')
+const game = new Whacka(3)
 
 function ready() {
-  const game = new Whacka(3)
-  const $moles = qsa('.mole-hole')
-
   $on(document.body, 'mousedown', e => {
     if (e.target.matches('.play-again')) {
       game.reset()
@@ -20,8 +18,9 @@ function ready() {
     }
   })
 
-  $moles.forEach((mole, i) => $on(mole, 'mousedown', () => game.hitMole(i)))
   game.start()
 }
 
 $on($start, 'click', ready)
+
+export { game }
