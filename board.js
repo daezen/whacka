@@ -1,4 +1,5 @@
-import { qs } from '/helpers.js'
+import { qs, qsa, $on } from '/helpers.js'
+import { game } from './main.js'
 
 export default class Board {
   constructor(size = 3) {
@@ -22,6 +23,8 @@ export default class Board {
       </div>`
       this.$board.innerHTML += moleHTML
     }
+    const $moles = qsa('.mole-hole')
+    $moles.forEach((mole, i) => $on(mole, 'mousedown', () => game.hitMole(i)))
   }
 
   makeGrid(size) {
