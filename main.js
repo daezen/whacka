@@ -1,7 +1,7 @@
 import { qs, $on } from './helpers.js'
 import Whacka from './whacka.js'
 const $start = qs('.start-button')
-const game = new Whacka(3)
+const game = new Whacka(30)
 
 function ready() {
   $on(document.body, 'mousedown', e => {
