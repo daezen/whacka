@@ -107,7 +107,7 @@ export default class Whacka {
     }
   }
 
-  update() { 
+  update() {
     this.view.setScore(this.score)
     this.view.setTime(this.timer)
     this.visibleMoles = 0
