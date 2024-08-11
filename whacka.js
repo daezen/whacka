@@ -29,6 +29,7 @@ export default class Whacka {
       }, 1000)
     }
     if (!start) clearTimeout(this.intervalId)
+    this.view.setTime(this.timer)
   }
 
   start() {
@@ -109,7 +110,6 @@ export default class Whacka {
 
   update() {
     this.view.setScore(this.score)
-    this.view.setTime(this.timer)
     this.visibleMoles = 0
 
     if (this.loop.time >= this.msToHide) {
