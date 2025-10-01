@@ -20,6 +20,16 @@ export default class View {
 
   showScoreOverlay(score) {
     let htmlString = `<div class="score-overlay"><p>Final Score: ${score}</p><button class="play-again">Play again</button></div>`
+    this.setHtml(htmlString)
+  }
+
+  toggleMenu(toShow) {
+    this.toggleOverlay(toShow)
+    let htmlString = `<div><p>Paused</p></div>`
+    this.setHtml(htmlString)
+  }
+
+  setHtml(htmlString) {
     this.$overlay.innerHTML = `${htmlString}`
   }
 }

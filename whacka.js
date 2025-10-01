@@ -4,32 +4,50 @@ import Loop from './loop.js'
 import View from './view.js'
 
 export default class Whacka {
-  constructor(time, size = 3, amountOfMoles = 3) {
-    this.view = new View(qs('[data-time]'), qs('.overlay'), qs('.score'))
-    this.loop = new Loop(() => this.update())
+  constructor(
+    time,
+    size = 3,
+    amountOfMoles = 3,
+    $view = {
+      $time: '[data-time]',
+      $overlay: '.overlay',
+      $score: '.score',
+    },
+  ) {
+    if (amountOfMoles > size * size) {
+      throw new Error('amountOfMoles cannot exceed available cells (size²)')
+    }
     this.size = size
+    this.view = new View(qs($view.$time), qs($view.$overlay), qs($view.$score))
+    this.loop = new Loop(() => this.update())
     this.board = new Board(this.size)
     this.time = time
     this.timer = time
     this.score = 0
     this.lastMole = null
     this.currMoles = []
-    this.msToHide = 600
-    this.visibleMoles = 0
+    this.msToHide = 900
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
     this.view.setTime(time)
+    this.intervalId = null
+    this.paused = false
   }
 
   timerInterval(start) {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = null
+    }
     if (start) {
       this.intervalId = setInterval(() => {
+        if (this.paused) return
         this.timer--
+        this.view.setTime(this.timer)
       }, 1000)
     }
-    if (!start) clearTimeout(this.intervalId)
-    this.view.setTime(this.timer)
+    if (!start) clearInterval(this.intervalId)
   }
 
   start() {
@@ -39,21 +57,45 @@ export default class Whacka {
     this.loop.start()
   }
 
-  stop() {
+  pause(toToggle) {
+    this.paused = toToggle
+    if (this.paused) {
+      this.view.toggleMenu(true)
+    } else {
+      this.view.toggleMenu(false)
+    }
+  }
+
+  togglePause() {
+    this.pause(!this.paused)
+  }
+
+  stop(showScore = true) {
+    if (this.intervalId) {
+      clearInterval(this.intervalId)
+      this.intervalId = null
+    }
+
     this.view.toggleOverlay(true)
     this.loop.stop()
-    this.view.showScoreOverlay(this.score)
-    this.timerInterval(false)
+
+    if (showScore) {
+      this.view.showScoreOverlay(this.score)
+    }
   }
 
   reset() {
+    this.stop(false)
     this.score = 0
     this.timer = this.time
     this.lastMole = null
     this.currMoles = []
     this.visibleMoles = 0
+    this.paused = false
     this.board = new Board(this.size)
     this.$moles = qsa('.mole')
+    this.view.setTime(this.timer)
+    this.$moles.forEach(mole => mole.classList.remove('mole--show'))
     this.start()
   }
 
@@ -79,11 +121,12 @@ export default class Whacka {
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
-    this.score -= 7
+    this.score = Math.max(0, this.score - 6)
   }
 
   hitMole(i) {
-    if (this.board.grid[i] === 0) return (this.score -= 5)
+    if (this.board.grid[i] === 0)
+      return (this.score = Math.max(0, this.score - 5))
     this.board.grid[i] = 0
     this.lastMole = i
     this.loop.resetTime()
@@ -92,7 +135,7 @@ export default class Whacka {
   }
 
   hitBoard() {
-    this.score -= 5
+    this.score = Math.max(0, this.score - 5)
   }
 
   updateCurrMoles(n, wasHit) {
@@ -109,6 +152,7 @@ export default class Whacka {
   }
 
   update() {
+    if (this.paused) return
     this.view.setScore(this.score)
     this.visibleMoles = 0
 
@@ -118,10 +162,9 @@ export default class Whacka {
 
     this.showMoles()
 
-    if (this.visibleMoles < 3) {
+    if (this.visibleMoles < this.amountOfMoles) {
       this.pickMole()
     }
-    if (this.score < 0) this.score = 0
 
     if (this.timer === 0) {
       this.stop()

@@ -1,7 +1,7 @@
 import { qs, $on } from './helpers.js'
 import Whacka from './whacka.js'
 const $start = qs('.start-button')
-const game = new Whacka(30)
+const game = new Whacka(30, 3, 3)
 
 function ready() {
   $on(document.body, 'mousedown', e => {
@@ -22,5 +22,14 @@ function ready() {
 }
 
 $on($start, 'click', ready)
+$on(document, 'keydown', e => {
+  if (e.key === 'Escape') {
+    game.togglePause()
+  }
+
+  if (e.key === ' ') {
+    game.reset()
+  }
+})
 
 export { game }
