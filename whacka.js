@@ -26,7 +26,7 @@ export default class Whacka {
     this.score = 0
     this.lastMole = null
     this.currMoles = []
-    this.msToHide = 900
+    this.msToHide = 700
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
