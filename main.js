@@ -28,7 +28,10 @@ $on(document, 'keydown', e => {
   }
 
   if (e.key === ' ') {
-    game.reset()
+    if (game.running || game.paused || qs('.play-again')) {
+      e.preventDefault()
+      game.reset()
+    }
   }
 })
 
