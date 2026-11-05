@@ -26,13 +26,14 @@ export default class Whacka {
     this.score = 0
     this.lastMole = null
     this.currMoles = []
-    this.msToHide = 700
+    this.msToHide = 900
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
     this.view.setTime(time)
     this.intervalId = null
     this.paused = false
+    this.running = false
   }
 
   timerInterval(start) {
@@ -51,8 +52,11 @@ export default class Whacka {
   }
 
   start() {
+    this.running = true
+    this.paused = false
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
     this.view.toggleOverlay(false)
+    this.loop.resetTime()
     this.timerInterval(true)
     this.loop.start()
   }
@@ -67,10 +71,12 @@ export default class Whacka {
   }
 
   togglePause() {
+    if (!this.running) return
     this.pause(!this.paused)
   }
 
   stop(showScore = true) {
+    this.running = false
     if (this.intervalId) {
       clearInterval(this.intervalId)
       this.intervalId = null
