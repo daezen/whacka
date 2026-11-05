@@ -20,7 +20,7 @@ export default class Whacka {
     this.size = size
     this.view = new View(qs($view.$time), qs($view.$overlay), qs($view.$score))
     this.loop = new Loop(() => this.update())
-    this.board = new Board(this.size)
+    this.board = new Board(this.size, i => this.hitMole(i))
     this.time = time
     this.timer = time
     this.score = 0
@@ -98,7 +98,7 @@ export default class Whacka {
     this.currMoles = []
     this.visibleMoles = 0
     this.paused = false
-    this.board = new Board(this.size)
+    this.board = new Board(this.size, i => this.hitMole(i))
     this.$moles = qsa('.mole')
     this.view.setTime(this.timer)
     this.$moles.forEach(mole => mole.classList.remove('mole--show'))
