@@ -1,15 +1,45 @@
 import { qs } from './helpers.js'
 
-const CONTROLS =
-  'Click or tap a mole · 1–9 hit a hole · Esc pause · Space restart'
+const CONTROLS = `
+  <div class="controls">
+    <p class="controls__goal">
+      Whack as many moles as you can in 30 seconds.
+    </p>
+    <ul class="controls__list">
+      <li><span class="controls__key">Tap</span> a mole to whack it</li>
+      <li class="controls__keyboard">
+        <span class="controls__key">1–9</span> hit a hole by position
+      </li>
+      <li class="controls__keyboard">
+        <span class="controls__key">Esc</span> pause or resume
+      </li>
+      <li class="controls__keyboard">
+        <span class="controls__key">Space</span> restart
+      </li>
+      <li class="controls__touch">
+        <span class="controls__key">⏸ ↻</span> pause or restart anytime
+      </li>
+    </ul>
+  </div>`
+
+const PAUSE_HINT = `
+  <p class="controls controls--hint">
+    <span class="controls__keyboard">Esc to resume · Space to restart</span>
+    <span class="controls__touch">Tap Resume or Restart</span>
+  </p>`
 
 export default class View {
   constructor($timer, $overlay, $score) {
     this.$timer = $timer
     this.$overlay = $overlay
     this.$score = $score
+    this.$gameActions = qs('.game-actions')
     this.best = 0
     this.score = null
+  }
+
+  setPlaying(isPlaying) {
+    if (this.$gameActions) this.$gameActions.hidden = !isPlaying
   }
 
   toggleOverlay(toShow) {
@@ -60,7 +90,7 @@ export default class View {
         <p>Final Score: ${score}</p>
         <p class="best">Best: ${this.best}</p>
         <button class="play-again" type="button">Play again</button>
-        <p class="controls">${CONTROLS}</p>
+        ${CONTROLS}
       </div>`)
   }
 
@@ -74,7 +104,7 @@ export default class View {
           <button class="restart-button" type="button">Restart</button>
         </div>
         <p class="best">Best: ${this.best}</p>
-        <p class="controls">Esc resume · Space restart</p>
+        ${PAUSE_HINT}
       </div>`)
   }
 

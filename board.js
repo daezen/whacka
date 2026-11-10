@@ -34,6 +34,7 @@ export default class Board {
     const $mole = $cell?.querySelector('.mole')
     if (!$mole) return
 
+    $mole.classList.remove('mole--show')
     $mole.classList.remove('mole--hit')
     void $mole.offsetWidth
     $mole.classList.add('mole--hit')

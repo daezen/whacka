@@ -44,9 +44,13 @@ $on(document, 'click', e => {
   const $button = e.target.closest('button')
   if (!$button) return
 
-  if ($button.matches('.start-button, .play-again, .restart-button')) {
+  if (
+    $button.matches(
+      '.start-button, .play-again, .restart-button, .game-restart',
+    )
+  ) {
     newGame()
-  } else if ($button.matches('.resume-button')) {
+  } else if ($button.matches('.resume-button, .game-pause')) {
     game.togglePause()
   } else if ($button.matches('.mute-button')) {
     game.sound.toggle()

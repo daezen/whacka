@@ -6,6 +6,8 @@ import View from './view.js'
 
 const BEST_KEY = 'whacka:best'
 const COUNTDOWN_STEP = 700
+// Keep a hit hole empty long enough for the drop/flash animation to finish.
+const HIT_RESPAWN_DELAY = 500
 
 export default class Whacka {
   constructor(
@@ -26,6 +28,7 @@ export default class Whacka {
     this.sound = new Sound()
     this.loop = new Loop(() => this.update())
     this.board = new Board(this.size, i => this.hitMole(i))
+    this.holeCooldowns = new Array(size * size).fill(0)
     this.time = time
     this.timer = time
     this.score = 0
@@ -91,6 +94,7 @@ export default class Whacka {
     this.paused = false
     this.countingDown = true
     this.countdownValue = 3
+    this.view.setPlaying(false)
     this.view.showCountdown(this.countdownValue)
     // Schedule first so an audio failure can never stall the countdown.
     this.countdownId = setTimeout(() => this.tickCountdown(), COUNTDOWN_STEP)
@@ -113,6 +117,7 @@ export default class Whacka {
     this.countingDown = false
     for (let i = 0; i < this.amountOfMoles; i++) this.pickMole()
     this.view.toggleOverlay(false)
+    this.view.setPlaying(true)
     this.loop.resetTime()
     this.timerInterval(true)
     this.loop.start()
@@ -133,8 +138,10 @@ export default class Whacka {
     this.paused = toToggle
     if (this.paused) {
       this.view.showPause()
+      this.view.setPlaying(false)
     } else {
       this.view.toggleOverlay(false)
+      this.view.setPlaying(true)
     }
   }
 
@@ -154,6 +161,7 @@ export default class Whacka {
     }
 
     this.view.toggleOverlay(true)
+    this.view.setPlaying(false)
     this.loop.stop()
 
     if (showScore) {
@@ -171,6 +179,7 @@ export default class Whacka {
     this.visibleMoles = 0
     this.paused = false
     this.board = new Board(this.size, i => this.hitMole(i))
+    this.holeCooldowns = new Array(this.size ** 2).fill(0)
     this.$moles = qsa('.mole')
     this.view.setTime(this.timer)
     this.view.setScore(this.score)
@@ -187,10 +196,21 @@ export default class Whacka {
   }
 
   pickMole() {
-    let i
-    do {
-      i = Math.floor(Math.random() * this.board.size ** 2)
-    } while (this.board.grid[i] === 1 || this.lastMole === i)
+    const now = performance.now()
+    const available = []
+    for (let i = 0; i < this.board.grid.length; i++) {
+      if (this.board.grid[i] === 1) continue
+      if (this.holeCooldowns[i] > now) continue
+      available.push(i)
+    }
+
+    // Prefer any hole other than the last one used, but fall back if it is the
+    // only option so picking can never get stuck.
+    const fresh = available.filter(i => i !== this.lastMole)
+    const pool = fresh.length > 0 ? fresh : available
+    if (pool.length === 0) return
+
+    const i = pool[Math.floor(Math.random() * pool.length)]
     this.board.grid[i] = 1
     this.updateCurrMoles(i)
   }
@@ -212,6 +232,7 @@ export default class Whacka {
     }
     this.board.grid[i] = 0
     this.lastMole = i
+    this.holeCooldowns[i] = performance.now() + HIT_RESPAWN_DELAY
     this.loop.resetTime()
     this.updateCurrMoles(i, true)
     this.board.flashMole(i)

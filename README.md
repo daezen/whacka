@@ -20,7 +20,8 @@ Then visit <http://localhost:8000/>.
 - **1–9** hit a hole by position (left-to-right, top-to-bottom).
 - **Esc** pauses and resumes.
 - **Space** restarts.
-- The speaker button in the top-right toggles sound.
+- On phones, use the **pause** and **restart** buttons at the top left.
+- The speaker button in the top right toggles sound.
 
 You have 30 seconds. A successful hit is **+10**, a miss is **−5**, and a mole
 that escapes costs **−6**. Your best score is saved in `localStorage`, and a
