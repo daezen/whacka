@@ -92,16 +92,17 @@ export default class Whacka {
     this.countingDown = true
     this.countdownValue = 3
     this.view.showCountdown(this.countdownValue)
-    this.sound.tick()
+    // Schedule first so an audio failure can never stall the countdown.
     this.countdownId = setTimeout(() => this.tickCountdown(), COUNTDOWN_STEP)
+    this.sound.tick()
   }
 
   tickCountdown() {
     this.countdownValue--
     if (this.countdownValue > 0) {
       this.view.showCountdown(this.countdownValue)
-      this.sound.tick()
       this.countdownId = setTimeout(() => this.tickCountdown(), COUNTDOWN_STEP)
+      this.sound.tick()
       return
     }
     this.beginRound()
@@ -115,9 +116,9 @@ export default class Whacka {
     this.loop.resetTime()
     this.timerInterval(true)
     this.loop.start()
-    this.sound.go()
     // If the tab went to the background during the countdown, pause right away.
     if (document.hidden) this.pause(true)
+    else this.sound.go()
   }
 
   cancelCountdown() {

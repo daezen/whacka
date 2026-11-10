@@ -5,7 +5,11 @@ const $mute = qs('.mute-button')
 const game = new Whacka(30, 3, 3)
 
 function newGame() {
-  game.sound.unlock()
+  try {
+    game.sound.unlock()
+  } catch {
+    // Sound is optional; never block starting a round.
+  }
   game.reset()
 }
 

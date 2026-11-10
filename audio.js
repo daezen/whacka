@@ -29,42 +29,58 @@ export default class Sound {
   }
 
   unlock() {
-    const ctx = this.ensure()
-    if (ctx && ctx.state === 'suspended') ctx.resume()
+    try {
+      const ctx = this.ensure()
+      if (ctx && ctx.state === 'suspended') {
+        Promise.resolve(ctx.resume()).catch(() => {})
+      }
+    } catch {
+      // Audio is best-effort and must never block the game.
+    }
   }
 
   ensure() {
     if (this.ctx) return this.ctx
-    const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext
-    if (!Ctx) return null
-    this.ctx = new Ctx()
+    try {
+      const Ctx = globalThis.AudioContext || globalThis.webkitAudioContext
+      if (!Ctx) return null
+      this.ctx = new Ctx()
+    } catch {
+      this.ctx = null
+    }
     return this.ctx
   }
 
   tone(freq, duration = 0.09, type = 'sine', volume = 0.05, endFreq = freq) {
     if (this.muted) return
-    const ctx = this.ensure()
-    if (!ctx) return
-    if (ctx.state === 'suspended') ctx.resume()
+    try {
+      const ctx = this.ensure()
+      if (!ctx) return
+      if (ctx.state === 'suspended') {
+        Promise.resolve(ctx.resume()).catch(() => {})
+      }
 
-    const now = ctx.currentTime
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
+      const now = ctx.currentTime
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
 
-    osc.type = type
-    osc.frequency.setValueAtTime(freq, now)
-    if (endFreq !== freq) {
-      osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration)
+      osc.type = type
+      osc.frequency.setValueAtTime(freq, now)
+      if (endFreq !== freq) {
+        osc.frequency.exponentialRampToValueAtTime(endFreq, now + duration)
+      }
+
+      gain.gain.setValueAtTime(0.0001, now)
+      gain.gain.exponentialRampToValueAtTime(volume, now + 0.01)
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
+
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.start(now)
+      osc.stop(now + duration + 0.02)
+    } catch {
+      // Audio is best-effort and must never interrupt gameplay.
     }
-
-    gain.gain.setValueAtTime(0.0001, now)
-    gain.gain.exponentialRampToValueAtTime(volume, now + 0.01)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration)
-
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start(now)
-    osc.stop(now + duration + 0.02)
   }
 
   tick() {
