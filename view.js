@@ -41,7 +41,16 @@ export default class View {
 
   showCountdown(value) {
     this.toggleOverlay(true)
-    this.setHtml(`<div class="countdown" aria-live="assertive">${value}</div>`)
+    const $countdown = qs('.countdown', this.$overlay)
+    if ($countdown) {
+      const $number = qs('.countdown__number', $countdown)
+      if ($number) $number.textContent = value
+      else $countdown.textContent = value
+      return
+    }
+    this.setHtml(
+      `<div class="countdown" aria-live="assertive" aria-atomic="true"><span class="countdown__number">${value}</span></div>`,
+    )
   }
 
   showScoreOverlay(score) {

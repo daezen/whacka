@@ -185,12 +185,8 @@ button:focus-visible {
   font-weight: 700;
   line-height: 1;
   color: white;
-  background: hsla(220, 40%, 10%, 0.8);
-  box-shadow:
-    0 0 0 1px hsla(210, 40%, 55%, 0.45),
-    0 1rem 3rem hsla(220, 50%, 5%, 0.45);
-  text-shadow: 0 0 2rem hsla(210, 80%, 55%, 0.6);
-  animation: countdown-pop 350ms ease-out;
+  background: hsla(220, 30%, 12%, 0.55);
+  backdrop-filter: blur(10px);
 }
 
 .background {
@@ -311,15 +307,6 @@ footer {
   text-align: center;
 }
 
-@keyframes countdown-pop {
-  from {
-    transform: scale(1.35);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
 @keyframes time-pulse {
   50% {
     opacity: 0.45;
@@ -344,10 +331,6 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .mole--show {
     transition: none;
-  }
-
-  .countdown {
-    animation: none;
   }
 
   .time--low {
