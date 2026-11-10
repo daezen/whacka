@@ -136,10 +136,12 @@ main {
 .mole {
   --bezier: cubic-bezier(0, 0.75, 0.4, 1.1);
   left: 50%;
-  width: 100px;
-  height: 150px;
+  width: 86%;
+  aspect-ratio: 2 / 3;
   position: absolute;
   background-image: url(./images/mole.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   /* transition: transform 100ms var(--bezier); */
   transform: translateX(-50%) translateY(100%);
 }
