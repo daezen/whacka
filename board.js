@@ -29,18 +29,19 @@ export default class Board {
     $holes.forEach((hole, i) => $on(hole, 'pointerdown', () => this.onHit(i)))
   }
 
-  flashCell(i) {
+  flashMole(i) {
     const $cell = this.$cells[i]
-    if (!$cell) return
+    const $mole = $cell?.querySelector('.mole')
+    if (!$mole) return
 
-    $cell.classList.remove('mole-container--hit')
-    void $cell.offsetWidth
-    $cell.classList.add('mole-container--hit')
+    $mole.classList.remove('mole--hit')
+    void $mole.offsetWidth
+    $mole.classList.add('mole--hit')
 
     clearTimeout(this.flashTimers[i])
     this.flashTimers[i] = setTimeout(() => {
-      $cell.classList.remove('mole-container--hit')
-    }, 250)
+      $mole.classList.remove('mole--hit')
+    }, 150)
   }
 
   makeGrid(size) {

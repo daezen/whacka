@@ -214,7 +214,7 @@ export default class Whacka {
     this.lastMole = i
     this.loop.resetTime()
     this.updateCurrMoles(i, true)
-    this.board.flashCell(i)
+    this.board.flashMole(i)
     this.sound.hit()
     this.score += 10
   }
