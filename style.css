@@ -269,6 +269,7 @@ button:focus-visible {
 
 .mole--hit {
   transform: translateX(-50%) translateY(30%);
+  animation: mole-hit-drop 160ms ease-in forwards;
 }
 
 .mole::after {
@@ -289,7 +290,7 @@ button:focus-visible {
 }
 
 .mole--hit::after {
-  animation: mole-hit-flash 160ms ease-out forwards;
+  animation: mole-hit-flash 100ms ease-out forwards;
 }
 
 .score-overlay {
@@ -327,6 +328,18 @@ footer {
   }
 }
 
+@keyframes mole-hit-drop {
+  0%,
+  50% {
+    transform: translateX(-50%) translateY(30%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mole--show {
     transition: none;
@@ -334,6 +347,10 @@ footer {
 
   .time--low {
     animation: none;
+  }
+
+  .mole--hit {
+    animation-duration: 1ms;
   }
 
   .mole--hit::after {

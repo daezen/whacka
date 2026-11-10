@@ -41,7 +41,7 @@ export default class Board {
     clearTimeout(this.flashTimers[i])
     this.flashTimers[i] = setTimeout(() => {
       $mole.classList.remove('mole--hit')
-    }, 200)
+    }, 180)
   }
 
   makeGrid(size) {
