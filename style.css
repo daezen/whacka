@@ -16,13 +16,22 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  display: flex;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  justify-items: center;
   align-items: center;
-  flex-direction: column;
-  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
   font-family: 'Montserrat', sans-serif;
   background-color: hsla(219, 22%, 52%, 0.15);
 }
@@ -33,16 +42,21 @@ h1 {
 }
 
 main {
+  width: 100%;
+  min-height: 0;
+  align-self: stretch;
   position: relative;
   perspective: 2000px;
+  display: grid;
+  place-items: center;
+  container-type: size;
 }
 
 .overlay {
   z-index: 99;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
   position: fixed;
+  inset: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: hsla(0, 0%, 0%, 0.25);
@@ -67,9 +81,12 @@ main {
 }
 
 .background {
-  width: 100%;
+  width: min(90vw, 70dvh, 700px);
+  width: min(90cqw, 90cqh, 700px);
   aspect-ratio: 1;
   position: absolute;
+  inset: 0;
+  margin: auto;
   border-radius: 3rem;
   background-color: var(--bg-clr);
   border: 2px solid hsl(210, 40%, 40%);
@@ -79,7 +96,8 @@ main {
 .board {
   display: grid;
   aspect-ratio: 1;
-  width: clamp(0px, 700px, 90vw);
+  width: min(90vw, 70dvh, 700px);
+  width: min(90cqw, 90cqh, 700px);
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
 }
@@ -139,8 +157,8 @@ main {
   border-radius: 25px;
   user-select: none;
   padding: 2rem;
-  height: 300px;
-  width: 500px;
+  width: min(500px, 90vw);
+  min-height: min(300px, 80dvh);
   background: hsla(0, 0%, 0%, 0.4);
   backdrop-filter: blur(69px);
 }
