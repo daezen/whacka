@@ -148,7 +148,7 @@ main {
 
 .mole--show {
   transition: transform 500ms var(--bezier);
-  transform: translateX(-50%) translateY(20%);
+  transform: translateX(-50%) translateY(30%);
 }
 
 .score-overlay {
