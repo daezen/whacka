@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Whacka</title>
+    <meta
+      name="description"
+      content="A minimal whack-a-mole game. Whack as many moles as you can in 30 seconds."
+    />
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,13 +20,36 @@
   </head>
   <body>
     <div class="overlay">
-      <button class="start-button">Start</button>
+      <div class="menu">
+        <button class="start-button" type="button">Start</button>
+        <p class="controls">
+          Click or tap a mole · 1–9 hit a hole · Esc pause · Space restart
+        </p>
+        <p class="best" data-best>Best: 0</p>
+      </div>
     </div>
+    <button
+      class="mute-button"
+      type="button"
+      aria-label="Mute sound"
+      aria-pressed="false"
+    >
+      🔊
+    </button>
+    <p class="sr-only" id="instructions">
+      Whack the moles by clicking or tapping them. Press keys 1 through 9 to hit
+      a hole. Escape pauses the game and Space restarts it.
+    </p>
     <h1>whacka</h1>
     <p data-time>Time: 0s</p>
     <main>
       <div class="background"></div>
-      <div class="board">
+      <div
+        class="board"
+        role="group"
+        aria-label="Whack-a-mole board"
+        aria-describedby="instructions"
+      >
         <div class="mole-container">
           <div class="mole-hole">
             <div class="mole"></div>
@@ -71,7 +98,7 @@
       </div>
     </main>
     <footer>
-      <p class="score">Score: 0</p>
+      <p class="score" aria-live="polite">Score: 0</p>
     </footer>
   </body>
 </html>

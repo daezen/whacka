@@ -34,6 +34,8 @@ body {
   padding: 1rem;
   font-family: 'Montserrat', sans-serif;
   background-color: hsla(219, 22%, 52%, 0.15);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1 {
@@ -59,6 +61,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
   background: hsla(0, 0%, 0%, 0.25);
 }
 
@@ -66,18 +69,118 @@ main {
   font-size: 2em;
 }
 
-.overlay p {
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: min(90vw, 500px);
+  padding: 2rem;
+  border-radius: 25px;
+  text-align: center;
+  background: hsla(220, 30%, 12%, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.menu > p:first-child,
+.score-overlay > p:first-child {
   font-size: 2.5em;
 }
 
-.start-button {
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.best {
+  font-size: 1.1em;
+  opacity: 0.85;
+}
+
+.controls {
+  max-width: 34ch;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.start-button,
+.play-again,
+.resume-button,
+.restart-button {
   cursor: pointer;
   border: none;
-  color: black;
-  font-size: 2rem;
   padding: 0.4em 1.5em;
   border-radius: 2em;
+  touch-action: manipulation;
+}
+
+.start-button,
+.play-again {
+  color: black;
+  font-size: 2rem;
   background: white;
+}
+
+.resume-button,
+.restart-button {
+  border: 1px solid hsl(210, 40%, 55%);
+  color: white;
+  font-size: 1.2rem;
+  background: hsl(210, 40%, 35%);
+}
+
+.resume-button {
+  border-color: white;
+  color: black;
+  background: white;
+}
+
+button:focus-visible {
+  outline: 3px solid hsl(205, 90%, 70%);
+  outline-offset: 3px;
+}
+
+.mute-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: white;
+  border: 1px solid hsl(210, 30%, 55% / 0.6);
+  border-radius: 50%;
+  background: hsl(210, 30%, 30% / 0.8);
+  touch-action: manipulation;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.countdown {
+  font-size: clamp(5rem, 22vmin, 12rem);
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 2rem hsl(210, 80%, 55% / 0.6);
+  animation: countdown-pop 350ms ease-out;
 }
 
 .background {
@@ -100,6 +203,12 @@ main {
   width: min(90cqw, 90cqh, 700px);
   grid-template-rows: repeat(3, 1fr);
   grid-template-columns: repeat(3, 1fr);
+  touch-action: manipulation;
+}
+
+.time--low {
+  color: hsl(0, 85%, 60%);
+  animation: time-pulse 1s ease-in-out infinite;
 }
 
 .mole-container {
@@ -122,6 +231,26 @@ main {
     radial-gradient(ellipse at center, transparent 35%, var(--bg-clr) 36%);
 }
 
+.mole-container::before {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  z-index: 2;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    hsl(48, 100%, 92%, 0.95),
+    hsl(48, 100%, 70%, 0.45) 45%,
+    transparent 70%
+  );
+}
+
+.mole-container--hit::before {
+  animation: hit-flash 220ms ease-out;
+}
+
 .mole-hole {
   width: 50%;
   display: flex;
@@ -131,6 +260,7 @@ main {
   align-items: center;
   aspect-ratio: 1.25/1;
   justify-content: center;
+  touch-action: manipulation;
 }
 
 .mole {
@@ -153,32 +283,71 @@ main {
 
 .score-overlay {
   display: flex;
-  justify-items: center;
+  justify-content: center;
   align-items: center;
   flex-flow: column;
+  gap: 0.75rem;
   border-radius: 25px;
   user-select: none;
   padding: 2rem;
   width: min(500px, 90vw);
   min-height: min(300px, 80dvh);
+  text-align: center;
   background: hsla(0, 0%, 0%, 0.4);
   backdrop-filter: blur(69px);
 }
 
-.score-overlay p {
-  flex: 1;
-}
-
-.play-again {
-  cursor: pointer;
-  border: none;
-  color: black;
-  font-size: 2rem;
-  padding: 0.4em 1.5em;
-  border-radius: 2em;
-  background: white;
-}
-
 footer {
   text-align: center;
+}
+
+@keyframes countdown-pop {
+  from {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes time-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes hit-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mole--show {
+    transition: none;
+  }
+
+  .countdown {
+    animation: none;
+  }
+
+  .time--low {
+    animation: none;
+  }
+
+  .mole-container--hit::before {
+    animation: none;
+    opacity: 0.55;
+  }
 }
