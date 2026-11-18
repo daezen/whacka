@@ -1,38 +1,26 @@
 import { qs } from './helpers.js'
 
-const CONTROLS = `
-  <div class="controls">
-    <p class="controls__goal">
-      Whack as many moles as you can in 30 seconds.
-    </p>
-    <ul class="controls__list">
-      <li><span class="controls__key">Tap</span> a mole to whack it</li>
-      <li class="controls__keyboard">
-        <span class="controls__key">1–9</span> hit a hole by position
-      </li>
-      <li class="controls__keyboard">
-        <span class="controls__key">Esc</span> pause or resume
-      </li>
-      <li class="controls__keyboard">
-        <span class="controls__key">Space</span> restart
-      </li>
-      <li class="controls__touch">
-        <span class="controls__key">⏸ ↻</span> pause or restart anytime
-      </li>
-    </ul>
-  </div>`
+const PLAY_HINT = {
+  keyboard: 'Click a mole to whack it · Esc to pause · Space to restart',
+  touch: 'Tap a mole to whack it · Use ⏸ or ↻ to pause or restart',
+}
 
-const PAUSE_HINT = `
-  <p class="controls controls--hint">
-    <span class="controls__keyboard">Esc to resume · Space to restart</span>
-    <span class="controls__touch">Tap Resume or Restart</span>
-  </p>`
+const PAUSE_HINT = {
+  keyboard: 'Esc to resume · Space to restart',
+  touch: 'Tap Resume or Restart',
+}
+
+const RESULTS_HINT = {
+  keyboard: 'Select Play again or press Space',
+  touch: 'Tap Play again',
+}
 
 export default class View {
-  constructor($timer, $overlay, $score) {
+  constructor($timer, $overlay, $score, durations) {
     this.$timer = $timer
     this.$overlay = $overlay
     this.$score = $score
+    this.durations = durations
     this.$gameActions = qs('.game-actions')
     this.best = 0
     this.score = null
@@ -83,29 +71,57 @@ export default class View {
     )
   }
 
-  showScoreOverlay(score) {
-    this.toggleOverlay(true)
-    this.setHtml(`
-      <div class="score-overlay">
-        <p>Final Score: ${score}</p>
-        <p class="best">Best: ${this.best}</p>
-        <button class="play-again" type="button">Play again</button>
-        ${CONTROLS}
-      </div>`)
+  showStart(time) {
+    this.showMenu(
+      'Whack as many moles as you can.',
+      '<button class="menu-button start-button" type="button">Start</button>',
+      PLAY_HINT,
+      time,
+    )
+  }
+
+  showScoreOverlay(score, duration) {
+    this.showMenu(
+      `Final Score: ${score}`,
+      '<button class="menu-button play-again" type="button">Play again</button>',
+      RESULTS_HINT,
+      duration,
+    )
   }
 
   showPause() {
-    this.toggleOverlay(true)
+    this.showMenu(
+      'Paused',
+      `<button class="menu-button resume-button" type="button">Resume</button>
+       <button class="menu-button menu-button--secondary restart-button" type="button">Restart</button>`,
+      PAUSE_HINT,
+    )
+  }
+
+  showMenu(title, actions, hint, duration) {
+    const settings = duration === undefined ? '' : `
+      <label class="menu__setting">
+        Round length
+        <select data-duration>
+          ${this.durations.map(seconds => `
+            <option value="${seconds}"${seconds === duration ? ' selected' : ''}>${seconds} seconds</option>
+          `).join('')}
+        </select>
+      </label>`
     this.setHtml(`
       <div class="menu">
-        <p>Paused</p>
-        <div class="menu-actions">
-          <button class="resume-button" type="button">Resume</button>
-          <button class="restart-button" type="button">Restart</button>
+        <h2 class="menu__title">${title}</h2>
+        <div class="menu__content">
+          <div class="menu-actions">${actions}</div>
+          <p class="best" data-best>Best: ${this.best}</p>
+          ${settings}
         </div>
-        <p class="best">Best: ${this.best}</p>
-        ${PAUSE_HINT}
+        <p class="menu__hint">
+          <span class="controls__keyboard">${hint.keyboard}</span>
+          <span class="controls__touch">${hint.touch}</span>
+        </p>
       </div>`)
+    this.toggleOverlay(true)
   }
 
   setHtml(htmlString) {

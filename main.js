@@ -1,8 +1,14 @@
 import { qs, $on } from './helpers.js'
-import Whacka from './whacka.js'
+import Whacka, { HIT_POINTS } from './whacka.js'
 
 const $mute = qs('.mute-button')
 const game = new Whacka(30, 3, 3)
+const $pointsPreview = document.createElement('span')
+$pointsPreview.className = 'hit-points hit-points--preview'
+$pointsPreview.textContent = `+${HIT_POINTS}`
+$pointsPreview.hidden = true
+$pointsPreview.setAttribute('aria-hidden', 'true')
+document.body.append($pointsPreview)
 
 function newGame() {
   try {
@@ -21,6 +27,7 @@ function updateMute() {
 }
 
 function handleKeydown(e) {
+  if (e.target.closest?.('select')) return
   if (e.key === 'Escape') {
     game.togglePause()
     return
@@ -37,7 +44,13 @@ function handleKeydown(e) {
   }
 
   if (e.ctrlKey || e.metaKey || e.altKey) return
-  if (/^[1-9]$/.test(e.key)) game.hitMole(Number(e.key) - 1)
+  if (!e.repeat && e.code === 'KeyP') {
+    $pointsPreview.hidden = !$pointsPreview.hidden
+    return
+  }
+  if (!e.repeat && e.code === 'KeyM') {
+    game.debugSpawnAll()
+  }
 }
 
 $on(document, 'click', e => {
@@ -70,6 +83,10 @@ $on(document.body, 'pointerdown', e => {
 })
 
 $on(document, 'keydown', handleKeydown)
+
+$on(document, 'change', e => {
+  if (e.target.matches('[data-duration]')) game.setDuration(Number(e.target.value))
+})
 
 $on(document, 'visibilitychange', () => {
   if (document.hidden && game.running && !game.paused && !game.countingDown) {

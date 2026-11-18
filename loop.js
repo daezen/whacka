@@ -4,7 +4,8 @@ export default class Loop {
     this.ms = 0
     this.oldTs = 0
     this.time = 0
-    this.toContinue = true
+    this.toContinue = false
+    this.frame = timestamp => this.loop(timestamp)
   }
 
   loop(timestamp) {
@@ -13,17 +14,19 @@ export default class Loop {
     this.oldTs = timestamp
     this.time += this.ms
     this.updateCallback()
-    this.animationId = requestAnimationFrame(this.loop.bind(this))
+    if (this.toContinue) this.animationId = requestAnimationFrame(this.frame)
   }
 
   start() {
+    if (this.toContinue) return
     this.toContinue = true
     this.oldTs = performance.now()
-    this.animationId = requestAnimationFrame(this.loop.bind(this))
+    this.animationId = requestAnimationFrame(this.frame)
   }
 
   stop() {
     this.toContinue = false
+    cancelAnimationFrame(this.animationId)
   }
 
   resetTime() {

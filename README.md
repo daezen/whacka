@@ -17,15 +17,18 @@ Then visit <http://localhost:8000/>.
 ## How to play
 
 - **Click / tap** a mole to whack it.
-- **1–9** hit a hole by position (left-to-right, top-to-bottom).
 - **Esc** pauses and resumes.
 - **Space** restarts.
 - On phones, use the **pause** and **restart** buttons at the top left.
 - The speaker button in the top right toggles sound.
+- **P** toggles a pinned points popup for styling.
+- **M** spawns a mole in every hole during an active round.
 
-You have 30 seconds. A successful hit is **+10**, a miss is **−5**, and a mole
-that escapes costs **−6**. Your best score is saved in `localStorage`, and a
-muted setting is remembered too.
+Choose **15, 30, or 60 seconds** from Round length on the start or results menu.
+A successful hit is **+10**, a miss is **−5**, and a mole
+that escapes costs **−6**. Every five consecutive hits earn **+2** extra.
+A miss or escape resets the streak.
+The game remembers your round length, best score for each duration, and mute setting.
 
 ## Files
 

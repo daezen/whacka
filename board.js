@@ -14,22 +14,22 @@ export default class Board {
   updateGrid(size) {
     this.$board.style.gridTemplateColumns = `repeat(${size}, 1fr)`
     this.$board.style.gridTemplateRows = `repeat(${size}, 1fr)`
-    this.$board.innerHTML = ''
+    const holes = []
     for (let i = 1; i <= size * size; i++) {
-      const moleHTML = `
+      holes.push(`
       <div class="mole-container">
         <div class="mole-hole" role="group" aria-label="Hole ${i}">
           <div class="mole"></div>
         </div>
-      </div>`
-      this.$board.innerHTML += moleHTML
+      </div>`)
     }
+    this.$board.innerHTML = holes.join('')
     this.$cells = qsa('.mole-container', this.$board)
     const $holes = qsa('.mole-hole', this.$board)
     $holes.forEach((hole, i) => $on(hole, 'pointerdown', () => this.onHit(i)))
   }
 
-  flashMole(i) {
+  flashMole(i, points) {
     const $cell = this.$cells[i]
     const $mole = $cell?.querySelector('.mole')
     if (!$mole) return
@@ -38,6 +38,13 @@ export default class Board {
     $mole.classList.remove('mole--hit')
     void $mole.offsetWidth
     $mole.classList.add('mole--hit')
+
+    const $points = document.createElement('span')
+    $points.className = 'hit-points'
+    $points.textContent = `+${points}`
+    $points.setAttribute('aria-hidden', 'true')
+    $points.addEventListener('animationend', () => $points.remove(), { once: true })
+    $cell.append($points)
 
     clearTimeout(this.flashTimers[i])
     this.flashTimers[i] = setTimeout(() => {

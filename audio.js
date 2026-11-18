@@ -91,8 +91,10 @@ export default class Sound {
     this.tone(780, 0.12, 'square', 0.05, 1040)
   }
 
-  hit() {
-    this.tone(880, 0.07, 'square', 0.06, 1320)
+  hit(bonus) {
+    this.tone(280, 0.08, 'sine', 0.11, 95)
+    this.tone(1250, 0.045, 'triangle', 0.05, 520)
+    if (bonus) this.tone(1047, 0.15, 'sine', 0.06, 1568)
   }
 
   miss() {

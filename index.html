@@ -19,32 +19,6 @@
     <link rel="shortcut icon" href="favicon.webp" type="image/x-icon" />
   </head>
   <body>
-    <div class="overlay">
-      <div class="menu">
-        <button class="start-button" type="button">Start</button>
-        <div class="controls">
-          <p class="controls__goal">
-            Whack as many moles as you can in 30 seconds.
-          </p>
-          <ul class="controls__list">
-            <li><span class="controls__key">Tap</span> a mole to whack it</li>
-            <li class="controls__keyboard">
-              <span class="controls__key">1–9</span> hit a hole by position
-            </li>
-            <li class="controls__keyboard">
-              <span class="controls__key">Esc</span> pause or resume
-            </li>
-            <li class="controls__keyboard">
-              <span class="controls__key">Space</span> restart
-            </li>
-            <li class="controls__touch">
-              <span class="controls__key">⏸ ↻</span> pause or restart anytime
-            </li>
-          </ul>
-        </div>
-        <p class="best" data-best>Best: 0</p>
-      </div>
-    </div>
     <header class="hud">
       <div class="game-actions" hidden>
         <button
@@ -73,64 +47,67 @@
       </button>
     </header>
     <p class="sr-only" id="instructions">
-      Whack the moles by clicking or tapping them. Press keys 1 through 9 to hit
-      a hole. Escape pauses the game and Space restarts it. The pause and restart
+      Whack the moles by clicking or tapping them. Escape pauses the game and
+      Space restarts it. The pause and restart
       buttons at the top left also work on touch screens.
     </p>
     <p data-time>Time: 0s</p>
     <main>
-      <div class="background"></div>
-      <div
-        class="board"
-        role="group"
-        aria-label="Whack-a-mole board"
-        aria-describedby="instructions"
-      >
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
+      <div class="board-frame">
+        <div class="background"></div>
+        <div
+          class="board"
+          role="group"
+          aria-label="Whack-a-mole board"
+          aria-describedby="instructions"
+        >
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
+          </div>
+          <div class="mole-container">
+            <div class="mole-hole">
+              <div class="mole"></div>
+            </div>
           </div>
         </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
-        <div class="mole-container">
-          <div class="mole-hole">
-            <div class="mole"></div>
-          </div>
-        </div>
+        <div class="overlay"></div>
       </div>
     </main>
     <footer>

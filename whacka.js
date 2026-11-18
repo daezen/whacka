@@ -5,7 +5,12 @@ import Sound from './audio.js'
 import View from './view.js'
 
 const BEST_KEY = 'whacka:best'
+const DURATION_KEY = 'whacka:duration'
+const ROUND_DURATIONS = [15, 30, 60]
 const COUNTDOWN_STEP = 700
+export const HIT_POINTS = 10
+const HITS_PER_BONUS = 5
+const STREAK_BONUS_POINTS = 2
 // Keep a hit hole empty long enough for the drop/flash animation to finish.
 const HIT_RESPAWN_DELAY = 500
 
@@ -24,16 +29,20 @@ export default class Whacka {
       throw new Error('amountOfMoles cannot exceed available cells (size²)')
     }
     this.size = size
-    this.view = new View(qs($view.$time), qs($view.$overlay), qs($view.$score))
+    this.view = new View(qs($view.$time), qs($view.$overlay), qs($view.$score), ROUND_DURATIONS)
     this.sound = new Sound()
     this.loop = new Loop(() => this.update())
     this.board = new Board(this.size, i => this.hitMole(i))
     this.holeCooldowns = new Array(size * size).fill(0)
-    this.time = time
-    this.timer = time
+    this.duration = this.loadDuration(time)
+    this.time = this.duration
+    this.timer = this.time
     this.score = 0
+    this.streak = 0
+    this.bestByDuration = new Map()
     this.best = this.loadBest()
     this.view.setBest(this.best)
+    this.view.showStart(this.time)
     this.lastMole = null
     this.currMoles = []
     this.visibleMoles = 0
@@ -41,8 +50,9 @@ export default class Whacka {
     this.msSinceLastHidden = 0
     this.$moles = qsa('.mole')
     this.amountOfMoles = amountOfMoles
-    this.view.setTime(time)
-    this.intervalId = null
+    this.view.setTime(this.timer)
+    this.timerId = null
+    this.tickRemaining = 1000
     this.paused = false
     this.running = false
     this.countingDown = false
@@ -50,17 +60,49 @@ export default class Whacka {
     this.countdownId = null
   }
 
-  loadBest() {
+  loadDuration(fallback) {
     try {
-      return Number(localStorage.getItem(BEST_KEY)) || 0
+      const duration = Number(localStorage.getItem(DURATION_KEY))
+      if (ROUND_DURATIONS.includes(duration)) return duration
     } catch {
-      return 0
+      // Use the default when storage is unavailable.
+    }
+    return fallback
+  }
+
+  setDuration(duration) {
+    if (this.running || !ROUND_DURATIONS.includes(duration)) return
+    this.duration = duration
+    try {
+      localStorage.setItem(DURATION_KEY, String(duration))
+    } catch {
+      // The selection still applies for this session.
+    }
+    if (this.view.$overlay.querySelector('.start-button')) {
+      this.time = this.timer = duration
+      this.best = this.loadBest()
+      this.view.setBest(this.best)
+      this.view.setTime(this.timer)
+    }
+  }
+
+  get bestKey() {
+    return this.time === 30 ? BEST_KEY : `${BEST_KEY}:${this.time}`
+  }
+
+  loadBest() {
+    const sessionBest = this.bestByDuration.get(this.time) ?? 0
+    try {
+      return Math.max(sessionBest, Number(localStorage.getItem(this.bestKey)) || 0)
+    } catch {
+      return sessionBest
     }
   }
 
   saveBest() {
+    this.bestByDuration.set(this.time, this.best)
     try {
-      localStorage.setItem(BEST_KEY, String(this.best))
+      localStorage.setItem(this.bestKey, String(this.best))
     } catch {
       // Storage can be unavailable; the best score just won't persist.
     }
@@ -73,19 +115,19 @@ export default class Whacka {
     this.view.setBest(this.best)
   }
 
-  timerInterval(start) {
-    if (this.intervalId) {
-      clearInterval(this.intervalId)
-      this.intervalId = null
-    }
-    if (start) {
-      this.intervalId = setInterval(() => {
-        if (this.paused) return
-        this.timer--
-        this.view.setTime(this.timer)
-      }, 1000)
-    }
-    if (!start) clearInterval(this.intervalId)
+  scheduleTimerTick() {
+    this.nextTickAt = performance.now() + this.tickRemaining
+    this.timerId = setTimeout(() => {
+      this.timerId = null
+      this.timer--
+      this.view.setTime(this.timer)
+      if (this.timer === 0) {
+        this.stop()
+        return
+      }
+      this.tickRemaining = 1000
+      this.scheduleTimerTick()
+    }, this.tickRemaining)
   }
 
   start() {
@@ -119,7 +161,8 @@ export default class Whacka {
     this.view.toggleOverlay(false)
     this.view.setPlaying(true)
     this.loop.resetTime()
-    this.timerInterval(true)
+    this.tickRemaining = 1000
+    this.scheduleTimerTick()
     this.loop.start()
     // If the tab went to the background during the countdown, pause right away.
     if (document.hidden) this.pause(true)
@@ -137,9 +180,15 @@ export default class Whacka {
   pause(toToggle) {
     this.paused = toToggle
     if (this.paused) {
+      this.tickRemaining = Math.max(0, this.nextTickAt - performance.now())
+      clearTimeout(this.timerId)
+      this.timerId = null
+      this.loop.stop()
       this.view.showPause()
       this.view.setPlaying(false)
     } else {
+      this.scheduleTimerTick()
+      this.loop.start()
       this.view.toggleOverlay(false)
       this.view.setPlaying(true)
     }
@@ -155,24 +204,26 @@ export default class Whacka {
     this.cancelCountdown()
     this.running = false
     this.paused = false
-    if (this.intervalId) {
-      clearInterval(this.intervalId)
-      this.intervalId = null
-    }
+    clearTimeout(this.timerId)
+    this.timerId = null
 
     this.view.toggleOverlay(true)
     this.view.setPlaying(false)
     this.loop.stop()
 
     if (showScore) {
-      this.view.showScoreOverlay(this.score)
+      this.view.showScoreOverlay(this.score, this.duration)
       this.sound.over()
     }
   }
 
   reset() {
     this.stop(false)
+    this.time = this.duration
+    this.best = this.loadBest()
+    this.view.setBest(this.best)
     this.score = 0
+    this.streak = 0
     this.timer = this.time
     this.lastMole = null
     this.currMoles = []
@@ -216,10 +267,12 @@ export default class Whacka {
   }
 
   hideMole(i) {
-    if (this.board.grid[i] === 0) return
+    if (this.board.grid[i] !== 1) return
     this.board.grid[i] = 0
+    this.updateCurrMoles(i, true)
     this.lastMole = i
     this.loop.resetTime()
+    this.streak = 0
     this.score = Math.max(0, this.score - 6)
     this.sound.escape()
   }
@@ -227,21 +280,35 @@ export default class Whacka {
   hitMole(i) {
     if (!this.running || this.paused || this.countingDown) return
     if (this.board.grid[i] === 0) {
-      this.sound.miss()
-      return (this.score = Math.max(0, this.score - 5))
+      this.hitBoard()
+      return
     }
     this.board.grid[i] = 0
     this.lastMole = i
     this.holeCooldowns[i] = performance.now() + HIT_RESPAWN_DELAY
     this.loop.resetTime()
     this.updateCurrMoles(i, true)
-    this.board.flashMole(i)
-    this.sound.hit()
-    this.score += 10
+    this.streak++
+    const earnedBonus = this.streak % HITS_PER_BONUS === 0
+    const points = HIT_POINTS + (earnedBonus ? STREAK_BONUS_POINTS : 0)
+    this.score += points
+    this.board.flashMole(i, points)
+    this.sound.hit(earnedBonus)
+  }
+
+  debugSpawnAll() {
+    if (!this.running || this.paused || this.countingDown) return
+    this.board.grid.fill(1)
+    this.currMoles = this.board.grid.map((_, i) => i)
+    this.$moles.forEach(mole => mole.classList.remove('mole--hit'))
+    this.visibleMoles = 0
+    this.showMoles()
+    this.loop.resetTime()
   }
 
   hitBoard() {
     if (!this.running || this.paused || this.countingDown) return
+    this.streak = 0
     this.sound.miss()
     this.score = Math.max(0, this.score - 5)
   }
@@ -272,10 +339,6 @@ export default class Whacka {
 
     if (this.visibleMoles < this.amountOfMoles) {
       this.pickMole()
-    }
-
-    if (this.timer === 0) {
-      this.stop()
     }
   }
 }
